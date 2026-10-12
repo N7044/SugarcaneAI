@@ -1,4 +1,4 @@
-﻿"""
+"""
 app.py - SugarcaneAI: Explainable AI & RAG Sugarcane Gap Detection System
 Streamlit Application Entrypoint.
 """
@@ -141,7 +141,9 @@ if "last_rag_query" not in st.session_state:
 st.sidebar.markdown("## ⚙️ Model Configuration")
 
 # Model Path Selection
-default_model_path = os.path.join(os.path.dirname(__file__), "models", "best.pt")
+root_model_path = os.path.join(os.path.dirname(__file__), "best.pt")
+models_dir_model_path = os.path.join(os.path.dirname(__file__), "models", "best.pt")
+default_model_path = root_model_path if os.path.exists(root_model_path) else models_dir_model_path
 model_option = st.sidebar.radio(
     "Weights Source",
     ["Default Path (models/best.pt)", "Custom Local Path", "Upload .pt Weights"],

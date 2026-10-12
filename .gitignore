@@ -8,10 +8,6 @@ env/
 venv/
 .venv/
 
-# Model checkpoints (prevent committing large weights)
-models/*.pt
-!models/.gitkeep
-
 # Environment variables & secrets
 .env
 
