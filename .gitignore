@@ -1,0 +1,24 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Model checkpoints (prevent committing large weights)
+models/*.pt
+!models/.gitkeep
+
+# Environment variables & secrets
+.env
+
+# Output files
+outputs/*
+!outputs/.gitkeep
+
+# OS generated
+.DS_Store
+Thumbs.db

@@ -1,0 +1,23 @@
+# Sugarcane Gap Management, Ground Verification, and Technical Limitations
+Source: Agricultural Engineering & Precision Agriculture Field Protocol (Educational Reference)
+
+## 1. Best Practices for Remedial Gap Filling
+When aerial imagery or ground scouting confirms substantial gaps exceeding 1 meter:
+1. Seedling Selection: Utilize single-bud nursery seedlings or polybag/tray-raised settling plants rather than unsprouted cane setts. Transplanted seedlings have an active root system and can compete with adjacent growing shoots.
+2. Soil Preparation: Loosen soil in the gap zone, ensure moisture availability, and place organic manure or starter phosphorus fertilizer to accelerate root anchorage.
+3. Post-Filling Care: Provide spot irrigation immediately upon transplanting. Protect young shoots from early shoot borer infestation using appropriate bio-control or soil drenching.
+
+## 2. Limitations of UAV and Remote Vision Gap Detection
+While object detection models (such as YOLOv8) provide rapid visual indexing of candidate gap regions, critical technical limitations must be acknowledged by agronomists and operators:
+1. Camera Angle and Ground Perspective: Oblique imagery or perspective distortion alters apparent spatial dimensions. Detected bounding boxes reflect pixel dimensions on 2D images, not calibrated physical metric lengths on the soil surface, unless calibrated with ground control points (GCPs) and orthomosaic metadata (GSD - Ground Sample Distance).
+2. Canopy Shadow and Occlusion: Long shadows cast during early morning or late afternoon flights can obscure small sugarcane shoots, causing false-positive gap detections.
+3. Weed Infestation (False Negatives): Fast-growing broadleaf weeds or grasses in empty furrows can visually mimic cane foliage, causing object detectors to miss genuine germination gaps.
+4. Absence of Plant Count Inference: A single detected gap bounding box indicates an apparent visual absence of continuous foliage, but does not definitively equal an exact count of dead buds or unsprouted setts without destructive ground sampling.
+5. Inability to Infer Subsurface Causes: Computer vision detects the visual symptom (canopy discontinuity) but cannot diagnose subsurface causal mechanisms (e.g., salinity, nematode load, grub feeding, or physiological water stress).
+
+## 3. Recommended Protocol: Pairing Vision with Ground Scouting
+Autonomous gap detection should always serve as a triage and prioritization tool rather than an automated replanting command:
+Step 1: Perform drone survey or field photograph analysis at 25-35 days post-planting (ideal canopy contrast before overlap).
+Step 2: Generate GPS-tagged or row-indexed candidate gap locations.
+Step 3: Dispatch field scouts to high-density gap clusters for physical soil inspection (checking sett rot, moisture level, pest emergence).
+Step 4: Execute targeted seedling nursery transplants strictly within agronomically viable windows.
