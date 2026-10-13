@@ -188,9 +188,18 @@ img_size = st.sidebar.select_slider("Inference Image Size", options=[320, 480, 6
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("## 🤖 RAG & LLM Assistant")
-gemini_key_input = st.sidebar.text_input("Gemini API Key (Optional)", type="password", help="If omitted, RAG runs in retrieval-only mode using local TF-IDF.")
+configured_key = os.getenv("GEMINI_API_KEY", "")
+gemini_key_input = st.sidebar.text_input(
+    "Gemini API Key (Optional)", 
+    value=configured_key,
+    type="password", 
+    help="If omitted, RAG runs in retrieval-only mode using local TF-IDF."
+)
 if gemini_key_input:
     os.environ["GEMINI_API_KEY"] = gemini_key_input
+    st.sidebar.markdown('<div class="badge-status-ok">● Gemini API Active</div>', unsafe_allow_html=True)
+else:
+    st.sidebar.markdown('<div class="badge-status-warn">⚪ Retrieval-Only Mode (Local)</div>', unsafe_allow_html=True)
 
 @st.cache_resource(show_spinner=False)
 def get_rag_engine() -> SugarcaneRAGEngine:

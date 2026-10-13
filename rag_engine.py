@@ -1,4 +1,4 @@
-﻿"""
+"""
 rag_engine.py - Retrieval-Augmented Generation (RAG) Module for SugarcaneAI
 Implements lightweight TF-IDF & Cosine Similarity vector retrieval over agronomic knowledge base,
 coupled with grounded LLM answer generation using the Google Gemini SDK.
@@ -101,8 +101,8 @@ class SugarcaneRAGEngine:
         corpus = [c.text for c in self.chunks]
         self.vectorizer = TfidfVectorizer(
             stop_words="english",
+            sublinear_tf=True,
             ngram_range=(1, 2),
-            max_df=0.95,
             min_df=1
         )
         self.tfidf_matrix = self.vectorizer.fit_transform(corpus)
@@ -179,7 +179,7 @@ class SugarcaneRAGEngine:
         query: str,
         api_key: Optional[str] = None,
         top_k: int = 3,
-        min_relevance_threshold: float = 0.08
+        min_relevance_threshold: float = 0.02
     ) -> Dict[str, Any]:
         """
         Full RAG pipeline:
@@ -192,9 +192,9 @@ class SugarcaneRAGEngine:
         max_score = retrieved_passages[0]["score"] if retrieved_passages else 0.0
 
         # Assess retrieval confidence
-        if max_score >= 0.30:
+        if max_score >= 0.12:
             confidence_level = "High"
-        elif max_score >= 0.15:
+        elif max_score >= 0.04:
             confidence_level = "Moderate"
         elif max_score >= min_relevance_threshold:
             confidence_level = "Low"
@@ -228,6 +228,18 @@ class SugarcaneRAGEngine:
 
         # Check for Gemini API Key
         effective_key = api_key or os.getenv("GEMINI_API_KEY")
+        if not effective_key:
+            env_file = os.path.join(os.path.dirname(self.kb_dir), ".env")
+            if os.path.exists(env_file):
+                try:
+                    with open(env_file, "r", encoding="utf-8") as f:
+                        env_raw = f.read().strip()
+                        if env_raw.startswith("GEMINI_API_KEY="):
+                            effective_key = env_raw.split("=", 1)[1].strip()
+                        elif env_raw:
+                            effective_key = env_raw
+                except Exception:
+                    pass
 
         if not effective_key:
             # Clean Retrieval-Only Mode
@@ -283,7 +295,15 @@ class SugarcaneRAGEngine:
 
             # Try modern Gemini models with fallback
             llm_response_text = ""
-            for model_candidate in ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"]:
+            candidate_errors = []
+            for model_candidate in [
+                "gemini-flash-latest",
+                "gemini-3.8-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-flash-lite-latest",
+                "gemini-pro-latest",
+                "gemini-1.5-flash"
+            ]:
                 try:
                     model = genai.GenerativeModel(model_candidate)
                     resp = model.generate_content(prompt)
@@ -291,10 +311,12 @@ class SugarcaneRAGEngine:
                         llm_response_text = resp.text
                         break
                 except Exception as model_err:
+                    candidate_errors.append(f"{model_candidate}: {str(model_err)}")
                     continue
 
             if not llm_response_text:
-                raise RuntimeError("Gemini API call returned empty response or candidate models were unavailable.")
+                err_detail = " | ".join(candidate_errors[:2]) if candidate_errors else "empty response"
+                raise RuntimeError(f"Gemini API models returned error: {err_detail}")
 
             return {
                 "answer": llm_response_text,
