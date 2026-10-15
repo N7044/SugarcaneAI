@@ -48,7 +48,7 @@ class SugarcaneRAGEngine:
         self.vectorizer: Optional[TfidfVectorizer] = None
         self.tfidf_matrix = None
         self.is_indexed: bool = False
-        self.gemini_model_name: str = "gemini-1.5-flash"
+        self.gemini_model_name: str = "gemini-3.8-flash"
         self._build_index()
 
     def reload_and_reindex(self, extra_texts: Optional[List[Tuple[str, str]]] = None) -> int:
@@ -297,12 +297,11 @@ class SugarcaneRAGEngine:
             llm_response_text = ""
             candidate_errors = []
             for model_candidate in [
-                "gemini-flash-latest",
                 "gemini-3.8-flash",
+                "gemini-flash-latest",
                 "gemini-2.5-flash-lite",
                 "gemini-flash-lite-latest",
-                "gemini-pro-latest",
-                "gemini-1.5-flash"
+                "gemini-pro-latest"
             ]:
                 try:
                     model = genai.GenerativeModel(model_candidate)
